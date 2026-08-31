@@ -49,7 +49,7 @@ jobs:
         env:
           DATABASE_URL: ${{ secrets.NEON_DATABASE_URL_PRE_PRODUCTION }}
         run: |
-          for file in migrations/*.sql
+          for file in Migrations/*.sql
           do
             version=$(basename "$file" .sql)
 
