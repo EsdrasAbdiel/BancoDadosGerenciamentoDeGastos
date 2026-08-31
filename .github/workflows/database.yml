@@ -1,0 +1,29 @@
+name: Database
+
+on:
+  push:
+    branches:
+      - pre-production
+      - master
+
+jobs:
+  database:
+    runs-on: ubuntu-latest
+
+    environment:
+      name: ${{ github.ref_name == 'master' && 'production' || 'pre-production' }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Instalar PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Testar conexão
+        env:
+          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+        run: |
+          psql "$DATABASE_URL" -c "SELECT current_database(), current_timestamp;"
