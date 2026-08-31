@@ -24,10 +24,10 @@ jobs:
 
       - name: Verificar DATABASE_URL
         env:
-          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL_PRE_PRODUCTION }}
         run: |
           if [ -z "$DATABASE_URL" ]; then
-            echo "ERRO: NEON_DATABASE_URL está vazio ou não foi encontrado."
+            echo "ERRO: NEON_DATABASE_URL_PRE_PRODUCTION está vazio ou não foi encontrado."
             exit 1
           fi
 
@@ -36,7 +36,7 @@ jobs:
 
       - name: Criar tabela de controle
         env:
-          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL_PRE_PRODUCTION }}
         run: |
           psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
           CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -47,7 +47,7 @@ jobs:
 
       - name: Executar migrations
         env:
-          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL_PRE_PRODUCTION }}
         run: |
           for file in migrations/*.sql
           do
