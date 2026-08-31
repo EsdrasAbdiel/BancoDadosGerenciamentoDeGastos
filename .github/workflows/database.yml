@@ -53,7 +53,7 @@ jobs:
           do
             version=$(basename "$file" .sql)
 
-            if [ "$version" = "000_create_schema_migrations" ]; then
+            if [ "$version" = "000-create-schema-migrations" ]; then
               continue
             fi
 
