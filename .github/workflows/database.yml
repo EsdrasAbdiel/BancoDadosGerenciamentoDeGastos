@@ -24,6 +24,6 @@ jobs:
 
       - name: Testar conexão
         env:
-          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL_PRE_PRODUCTION }}
         run: |
           psql "$DATABASE_URL" -c "SELECT current_database(), current_timestamp;"
