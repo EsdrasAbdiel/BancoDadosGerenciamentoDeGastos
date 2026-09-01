@@ -11,6 +11,19 @@ CREATE TABLE public.categoria (
 );
 
 
+-- public.schema_migrations definição
+
+-- Drop table
+
+-- DROP TABLE public.schema_migrations;
+
+CREATE TABLE public.schema_migrations (
+	"version" varchar(255) NOT NULL,
+	applied_at timestamp DEFAULT CURRENT_TIMESTAMP NOT NULL,
+	CONSTRAINT schema_migrations_pkey PRIMARY KEY (version)
+);
+
+
 -- public.usuario definição
 
 -- Drop table

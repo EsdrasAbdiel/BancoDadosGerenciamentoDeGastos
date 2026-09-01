@@ -1,0 +1,26 @@
+name: Database Migration
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  migrate:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Install PostgreSQL client
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y postgresql-client
+
+      - name: Run migrations
+        env:
+          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL_PRE_PRODUCTION }}
+        run: |
+          chmod +x scripts/migrate.sh
+          ./scripts/migrate.sh
