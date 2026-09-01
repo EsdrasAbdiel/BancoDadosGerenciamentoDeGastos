@@ -39,4 +39,4 @@ jobs:
           DATABASE_URL: ${{ secrets.NEON_DATABASE_URL_PRODUCTION }}
         run: |
           chmod +x scripts/migrate.sh
-          ./scripts/migrate.sh
+          ./scripts/migrate.sh 
