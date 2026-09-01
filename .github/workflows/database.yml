@@ -15,6 +15,11 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v6
 
+      - name: Show environment
+        run: |
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Environment: ${{ github.ref_name }}"
+
       - name: Install PostgreSQL client
         run: |
           sudo apt-get update
