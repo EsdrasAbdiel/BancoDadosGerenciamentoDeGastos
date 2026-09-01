@@ -2,6 +2,11 @@
 
 set -e
 
+if [ -z "$DATABASE_URL" ]; then
+    echo "Erro: DATABASE_URL não está configurada."
+    exit 1
+fi
+
 echo "Iniciando migrations..."
 
 psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
@@ -26,9 +31,9 @@ for file in scripts/migrations/*.sql; do
         -v ON_ERROR_STOP=1 \
         -f "$file"
 
-    psql "$DATABASE_URL" -v ON_ERROR_STOP=1 \
+    psql "$DATABASE_URL" \
+        -v ON_ERROR_STOP=1 \
         -c "INSERT INTO schema_migrations (version) VALUES ('$version');"
-
 done
 
-echo "Migrations concluï¿½das!"
+echo "Migrations concluídas!"
