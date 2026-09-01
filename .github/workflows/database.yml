@@ -3,7 +3,8 @@ name: Database Migration
 on:
   push:
     branches:
-      - master
+      - pre-production
+      - production
 
 jobs:
   migrate:
@@ -18,9 +19,18 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client
 
-      - name: Run migrations
+      - name: Run migrations - Pre-Production
+        if: github.ref == 'refs/heads/develop'
         env:
           DATABASE_URL: ${{ secrets.NEON_DATABASE_URL_PRE_PRODUCTION }}
+        run: |
+          chmod +x scripts/migrate.sh
+          ./scripts/migrate.sh
+
+      - name: Run migrations - Production
+        if: github.ref == 'refs/heads/master'
+        env:
+          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL_PRODUCTION }}
         run: |
           chmod +x scripts/migrate.sh
           ./scripts/migrate.sh
