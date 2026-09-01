@@ -36,4 +36,4 @@ for file in scripts/migrations/*.sql; do
         -c "INSERT INTO schema_migrations (version) VALUES ('$version');"
 done
 
-echo "Migrations concluídas!"
+echo "Migrations concluídas!" 
