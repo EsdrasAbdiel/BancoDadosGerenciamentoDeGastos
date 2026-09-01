@@ -1,84 +1,26 @@
-name: Database
+name: Database Migration
 
 on:
   push:
     branches:
-      - pre-production
       - master
 
 jobs:
-  database:
+  migrate:
     runs-on: ubuntu-latest
-
-    environment:
-      name: ${{ github.ref_name == 'master' && 'production' || 'pre-production' }}
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
-      - name: Instalar PostgreSQL client
+      - name: Install PostgreSQL client
         run: |
           sudo apt-get update
           sudo apt-get install -y postgresql-client
 
-      - name: Verificar DATABASE_URL
+      - name: Run migrations
         env:
           DATABASE_URL: ${{ secrets.NEON_DATABASE_URL_PRE_PRODUCTION }}
         run: |
-          if [ -z "$DATABASE_URL" ]; then
-            echo "ERRO: NEON_DATABASE_URL_PRE_PRODUCTION está vazio ou não foi encontrado."
-            exit 1
-          fi
-
-          echo "DATABASE_URL configurada."
-          echo "$DATABASE_URL" | sed -E 's#(postgresql://[^@]+@)([^/?]+).*#Host: \2#'
-
-      - name: Criar tabela de controle
-        env:
-          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL_PRE_PRODUCTION }}
-        run: |
-          psql "$DATABASE_URL" -v ON_ERROR_STOP=1 <<'SQL'
-          CREATE TABLE IF NOT EXISTS schema_migrations (
-              version VARCHAR(255) PRIMARY KEY,
-              applied_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
-          );
-          SQL
-
-      - name: Executar migrations
-        env:
-          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL_PRE_PRODUCTION }}
-        run: |
-          for file in Migrations/*.sql
-          do
-            version=$(basename "$file" .sql)
-
-            if [ "$version" = "000_create_schema_migrations" ]; then
-              continue
-            fi
-
-            already_applied=$(psql "$DATABASE_URL" -tAc \
-              "SELECT COUNT(*) FROM schema_migrations WHERE version = '$version';")
-
-            if [ "$already_applied" -eq "0" ]; then
-
-              echo "====================================="
-              echo "Executando migration: $version"
-              echo "====================================="
-
-              psql "$DATABASE_URL" \
-                -v ON_ERROR_STOP=1 \
-                -f "$file"
-
-              psql "$DATABASE_URL" \
-                -v ON_ERROR_STOP=1 \
-                -c "INSERT INTO schema_migrations (version) VALUES ('$version');"
-
-              echo "Migration aplicada: $version"
-
-            else
-
-              echo "Migration já aplicada: $version"
-
-            fi
-          done
+          chmod +x scripts/migrate.sh
+          ./scripts/migrate.sh
