@@ -3,11 +3,14 @@ name: Database Migration
 on:
   push:
     branches:
-      - master
+      - pre-production
+      - production
 
 jobs:
   migrate:
     runs-on: ubuntu-latest
+
+    environment: ${{ github.ref == 'refs/heads/production' && 'NEON_DATABASE_URL_PRODUCTION' || 'NEON_DATABASE_URL_PRE_PRODUCTION' }}
 
     steps:
       - name: Checkout
@@ -18,9 +21,16 @@ jobs:
           sudo apt-get update
           sudo apt-get install -y postgresql-client
 
+      - name: Show environment
+        run: |
+          echo "Branch: ${{ github.ref_name }}"
+          echo "Environment: ${{ github.ref == 'refs/heads/production' && 'NEON_DATABASE_URL_PRODUCTION' || 'NEON_DATABASE_URL_PRE_PRODUCTION' }}"
+
       - name: Run migrations
         env:
-          DATABASE_URL: ${{ secrets.NEON_DATABASE_URL_PRE_PRODUCTION }}
+          DATABASE_URL: ${{ github.ref == 'refs/heads/production'
+            && secrets.NEON_DATABASE_URL_PRODUCTION
+            || secrets.NEON_DATABASE_URL_PRE_PRODUCTION }}
         run: |
           chmod +x scripts/migrate.sh
           ./scripts/migrate.sh
