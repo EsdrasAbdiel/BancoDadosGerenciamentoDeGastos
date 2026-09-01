@@ -31,4 +31,4 @@ for file in scripts/migrations/*.sql; do
 
 done
 
-echo "Migrations concluídas!"
+echo "Migrations concluï¿½das!"
